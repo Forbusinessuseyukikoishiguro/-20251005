@@ -1,0 +1,160 @@
+了解です！
+かわいくて覚えやすい「**ふわふわ大福店のうさうさ店長**」をテーマに、**Pythonでロガー（ログ記録用）関数**を作ってみましょう！
+
+---
+
+## 🐰🎂 目的：「うさうさ店長」が毎日売上やエラーを記録するログ帳を自動でつける！
+
+---
+
+## ✅ 完成イメージ
+
+* ログは `logs/usausa.log.2025-10-05` のように日付で保存
+* 画面（コンソール）にも表示
+* 簡単に使えるように関数で定義
+
+---
+
+## ✅ 使い方（完成コードのあとで解説します）
+
+```python
+from usa_logger import setup_usausa_logger
+
+logger = setup_usausa_logger()
+
+logger.info("今日のいちご大福、売り切れました！")
+logger.error("あんこを床にぶちまけました…😭")
+```
+
+---
+
+## 🐰 ロガー関数コード：`usa_logger.py`
+
+```python
+import os
+import logging
+from logging.handlers import TimedRotatingFileHandler
+
+def setup_usausa_logger(log_dir='logs', log_name='usausa.log'):
+    """
+    ふわふわ大福店うさうさ店長のためのロガー設定関数 🐰🍡
+
+    Args:
+        log_dir (str): ログファイル保存ディレクトリ
+        log_name (str): ベースとなるログファイル名
+
+    Returns:
+        logging.Logger: 設定済みのロガー
+    """
+
+    # ① ログディレクトリ作成（なければ作る）
+    os.makedirs(log_dir, exist_ok=True)
+
+    # ② ロガーを取得（モジュール名などで一意にする）
+    logger = logging.getLogger('usausa_logger')
+    logger.setLevel(logging.INFO)
+
+    # ③ 同じログが重複しないように既存ハンドラーを削除
+    if logger.hasHandlers():
+        logger.handlers.clear()
+
+    # ④ フォーマット定義
+    formatter = logging.Formatter('%(asctime)s [%(levelname)s] - %(message)s')
+
+    # ⑤ 日付で自動分割されるログファイルハンドラー
+    log_path = os.path.join(log_dir, log_name)
+    file_handler = TimedRotatingFileHandler(
+        filename=log_path,
+        when='midnight',
+        interval=1,
+        backupCount=7,
+        encoding='utf-8'
+    )
+    file_handler.suffix = "%Y-%m-%d"  # ファイル名に日付追加
+    file_handler.setFormatter(formatter)
+
+    # ⑥ コンソール出力（画面表示）用ハンドラー
+    console_handler = logging.StreamHandler()
+    console_handler.setFormatter(formatter)
+
+    # ⑦ ロガーにハンドラーを追加
+    logger.addHandler(file_handler)
+    logger.addHandler(console_handler)
+
+    return logger
+```
+
+---
+
+## ✅ 使い方（再掲）
+
+### 🔸 ファイル構成（例）:
+
+```
+your_project/
+├── usa_logger.py
+└── main.py
+```
+
+### 🔸 `main.py`：
+
+```python
+from usa_logger import setup_usausa_logger
+
+logger = setup_usausa_logger()
+
+logger.info("今日のうぐいす大福は大人気でした！")
+logger.warning("白玉粉が残り少ないです…")
+logger.error("冷蔵庫が壊れました！！")
+```
+
+---
+
+## ✅ 出力されるログファイル例
+
+```
+logs/
+├── usausa.log           ← 今日のログ（最新）
+├── usausa.log.2025-10-04
+├── usausa.log.2025-10-03
+```
+
+ファイル内容（例）：
+
+```
+2025-10-05 15:00:01 [INFO] - 今日のうぐいす大福は大人気でした！
+2025-10-05 15:00:10 [ERROR] - 冷蔵庫が壊れました！！
+```
+
+---
+
+## 📝 補足：このロガーの特徴
+
+| 特徴           | 説明                          |
+| ------------ | --------------------------- |
+| 🗂 日付付きファイル  | 自動で `YYYY-MM-DD` 形式にローテーション |
+| 👀 コンソールにも表示 | 実行中に画面でも確認できる               |
+| 🧼 古いログ削除    | 最大7日分だけ保存（`backupCount=7`）  |
+| 🐣 コピペでOK    | 自作モジュールとしてすぐ再利用できる          |
+
+---
+
+## ✅ おまけ：絵文字バージョンでログも可愛い出力にする
+
+```python
+formatter = logging.Formatter('🐰 %(asctime)s [%(levelname)s] 🍡 - %(message)s')
+```
+
+---
+
+## 🔚 まとめ
+
+| やりたいこと      | 実現方法                               |
+| ----------- | ---------------------------------- |
+| ファイルに毎日ログ保存 | `TimedRotatingFileHandler` 使用      |
+| 画面にも出したい    | `StreamHandler` 併用                 |
+| ロガー関数化      | `setup_usausa_logger()` 関数で呼び出し簡単に |
+
+---
+
+ご希望あれば、**エラーだけ別ファイルに記録する「黒うさぎ店長」バージョン**も作れますよ！🐇🔧
