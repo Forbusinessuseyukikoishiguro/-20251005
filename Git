@@ -1,0 +1,107 @@
+いいですね！仮想環境を作るのはとても良い習慣です🐰🧁
+では、`C:\Users\yukik\Desktop\excel\usausalog` に **Pythonの仮想環境** を作る方法を、**コマンド一つずつ＆わかりやすく**説明します。
+
+---
+
+## ✅ 仮想環境を作るステップ（Windows）
+
+---
+
+### ① PowerShell または コマンドプロンプト を開く
+
+（すでに開いてるならそのままでOK）
+
+---
+
+### ② プロジェクトフォルダへ移動
+
+```powershell
+cd "C:\Users\yukik\Desktop\excel\usausalog"
+```
+
+※ `cd` のあとに `"フォルダのパス"` を入力
+（ダブルクォートで囲むとスペースがあってもOK）
+
+---
+
+### ③ 仮想環境を作成
+
+```powershell
+python -m venv venv
+```
+
+⬇ 実行後、このような構成になります：
+
+```
+usausalog/
+├── main.py
+├── usa_logger.py
+└── venv/ ← これが仮想環境
+```
+
+---
+
+### ④ 仮想環境を有効化（activate）
+
+```powershell
+.\venv\Scripts\Activate
+```
+
+⬆ これを実行すると、プロンプトがこう変わります：
+
+```powershell
+(venv) PS C:\Users\yukik\Desktop\excel\usausalog>
+```
+
+これで「仮想環境の中」に入った状態です。
+
+---
+
+### ⑤ ログモジュールなど標準ライブラリだけならインストール不要
+
+ただし、外部ライブラリ（例：`pandas` や `openpyxl`）を使いたいときは：
+
+```powershell
+pip install pandas
+pip install openpyxl
+```
+
+---
+
+### ⑥ Pythonファイルを仮想環境で実行
+
+```powershell
+python main.py
+```
+
+---
+
+### ⑦ 仮想環境を終了したいとき（deactivate）
+
+```powershell
+deactivate
+```
+
+---
+
+## ✅ まとめ（全体の流れ）
+
+```powershell
+cd "C:\Users\yukik\Desktop\excel\usausalog"
+python -m venv venv
+.\venv\Scripts\Activate
+python main.py
+deactivate
+```
+
+---
+
+## 📝 補足：初回だけ注意！
+
+* `python` コマンドが認識されない場合は `py` でもOKです。
+* Windowsでスクリプト実行がブロックされる場合は、別途許可が必要（その時教えてください）
+
+---
+
+ご不明な点があれば、仮想環境の状態を確認しながら一緒に進められますよ。
+安心して聞いてくださいね🐇✨
