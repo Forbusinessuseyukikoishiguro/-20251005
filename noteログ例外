@@ -1,0 +1,271 @@
+最高ですね👏✨
+「うさうさ店長ログ」シリーズをもとに、**新人エンジニア向け：Python ログ＆例外処理チートシート** 記事としてまとめました。
+実務の理解・実装・学習用に最適な **「読む→理解→すぐ書ける」構成** です。
+note用に整形済み（そのままコピペで投稿OK）👇
+
+---
+
+# 🐰💻 新人エンジニア向け：Pythonログ＆例外処理チートシート
+
+～「うさうさ店長のふわふわ大福店」で学ぶログと例外の世界～
+
+---
+
+## 🎯 この記事の目的
+
+Pythonエンジニアとして仕事を始めたばかりの方へ。
+「コードが動かない…」「どこで落ちたかわからない…」そんなときの味方が **ログ（logging）と例外（Exception）**。
+
+この記事では、**現場で使える形のログ＋例外処理テンプレート**を、
+「ふわふわ大福店のうさうさ店長🐰」をテーマにやさしく解説します。
+
+---
+
+## 📘 目次
+
+1. ログとは？
+2. Pythonでのログの基本構造
+3. 実践：「うさうさ店長ロガー」コード
+4. ログの出力例
+5. 例外処理（try / except）の基本
+6. ログ × 例外：現場のチートシート例
+7. ログ設計のベストプラクティス
+8. まとめ
+
+---
+
+## 🪄 1. ログとは？
+
+> 「ログ」とは、プログラムの実行中に“何が起きたか”を記録するメモ帳です。
+
+たとえば：
+
+* 正常処理 → `INFO`
+* 注意が必要 → `WARNING`
+* エラー発生 → `ERROR`
+* 致命的な停止 → `CRITICAL`
+
+この情報を「ファイル」や「画面」に残しておくことで、
+不具合の原因を特定したり、データ分析の履歴として活用できます。
+
+---
+
+## 🐰 2. Pythonでのログの基本構造
+
+```python
+import logging
+
+logging.basicConfig(level=logging.INFO)
+
+logging.info("今日の大福は売り切れました！")
+logging.warning("白玉粉が残り少ないです…")
+logging.error("冷蔵庫が壊れました！")
+```
+
+📘出力例：
+
+```
+INFO:root:今日の大福は売り切れました！
+WARNING:root:白玉粉が残り少ないです…
+ERROR:root:冷蔵庫が壊れました！
+```
+
+---
+
+## 🍡 3. 実践：「うさうさ店長ロガー」コード
+
+**ファイル：`usa_logger.py`**
+
+```python
+import os
+import logging
+from logging.handlers import TimedRotatingFileHandler
+
+def setup_usausa_logger(log_dir='logs', log_name='usausa.log'):
+    """
+    ふわふわ大福店うさうさ店長のためのロガー設定関数 🐰🍡
+    """
+
+    # ① ログフォルダがなければ作成
+    os.makedirs(log_dir, exist_ok=True)
+
+    # ② ロガーの作成
+    logger = logging.getLogger('usausa_logger')
+    logger.setLevel(logging.INFO)
+
+    # ③ 重複防止
+    if logger.hasHandlers():
+        logger.handlers.clear()
+
+    # ④ 出力フォーマット
+    formatter = logging.Formatter('%(asctime)s [%(levelname)s] - %(message)s')
+
+    # ⑤ 日付ごとに自動でファイルを切り替え
+    file_handler = TimedRotatingFileHandler(
+        filename=os.path.join(log_dir, log_name),
+        when='midnight', interval=1, backupCount=7, encoding='utf-8'
+    )
+    file_handler.suffix = "%Y-%m-%d"
+    file_handler.setFormatter(formatter)
+
+    # ⑥ コンソール表示用
+    console_handler = logging.StreamHandler()
+    console_handler.setFormatter(formatter)
+
+    # ⑦ ロガーに追加
+    logger.addHandler(file_handler)
+    logger.addHandler(console_handler)
+
+    return logger
+```
+
+---
+
+## 💡 4. ログの出力例
+
+**main.py**
+
+```python
+from usa_logger import setup_usausa_logger
+
+logger = setup_usausa_logger()
+
+logger.info("今日のうぐいす大福は大人気でした！")
+logger.warning("白玉粉が残り少ないです…")
+logger.error("冷蔵庫が壊れました！！")
+logger.critical("店舗の水道が止まりました！！！")
+```
+
+📄 出力イメージ：
+
+```
+2025-10-05 17:00:07,039 [INFO] - 今日のうぐいす大福は大人気でした！
+2025-10-05 17:00:07,040 [WARNING] - 白玉粉が残り少ないです…
+2025-10-05 17:00:07,041 [ERROR] - 冷蔵庫が壊れました！！
+2025-10-05 17:00:07,042 [CRITICAL] - 店舗の水道が止まりました！！！
+```
+
+🗂 ログファイルも自動保存：
+
+```
+logs/
+├── usausa.log.2025-10-05
+├── usausa.log.2025-10-04
+```
+
+---
+
+## 🧯 5. 例外処理（try / except）の基本
+
+```python
+try:
+    result = 10 / 0  # ← わざとエラー
+except ZeroDivisionError as e:
+    print("0で割ることはできません！")
+    print(f"エラー内容: {e}")
+```
+
+出力：
+
+```
+0で割ることはできません！
+エラー内容: division by zero
+```
+
+---
+
+## 🧩 6. ログ × 例外：現場チートシート例
+
+```python
+from usa_logger import setup_usausa_logger
+logger = setup_usausa_logger()
+
+try:
+    logger.info("在庫チェックを開始します。")
+    stock = {"いちご": 5, "白玉": 0}
+    
+    # 在庫がない商品を検出
+    if stock["白玉"] == 0:
+        raise ValueError("白玉の在庫がゼロです！")
+
+except Exception as e:
+    logger.error(f"エラー発生：{e}")
+else:
+    logger.info("在庫チェック完了。問題なし。")
+finally:
+    logger.info("処理を終了します。")
+```
+
+出力：
+
+```
+2025-10-05 17:30:01,100 [INFO] - 在庫チェックを開始します。
+2025-10-05 17:30:01,101 [ERROR] - エラー発生：白玉の在庫がゼロです！
+2025-10-05 17:30:01,102 [INFO] - 処理を終了します。
+```
+
+---
+
+## 🪶 7. ログ設計ベストプラクティス
+
+| 分類         | 使うメソッド | 意味・用途   |
+| ---------- | ------ | ------- |
+| `debug`    | デバッグ情報 | 開発時だけ使う |
+| `info`     | 通常動作   | 成功・進行ログ |
+| `warning`  | 軽微な異常  | 注意喚起    |
+| `error`    | 実行エラー  | 修正が必要   |
+| `critical` | 致命的停止  | 即対応レベル  |
+
+📘Tips：
+
+* 重要ログには「処理の区切り」＋「発生箇所」を記録
+* 日付付きローテーションを設定して運用が楽に
+* ファイルとコンソール出力を**両方設定**が現場定番
+
+---
+
+## 🐰🍡 8. まとめ
+
+| やりたいこと  | 実現方法                              |
+| ------- | --------------------------------- |
+| 毎日ログを残す | `TimedRotatingFileHandler`        |
+| 画面にも出力  | `StreamHandler`                   |
+| ログ整形    | `Formatter`                       |
+| 例外も記録   | `try / except` + `logger.error()` |
+| 再利用したい  | 関数 `setup_usausa_logger()` にまとめる  |
+
+---
+
+## 💬 最後に
+
+ログと例外は「未来の自分へのメッセージ」です。
+何が起きたかを正確に記録できるようになると、
+トラブル対応もスムーズに、プロジェクトの信頼度もUPします。
+
+🐰「うさうさ店長」も今日もログを書きながらこう言いました。
+
+> 「バグもデータも、ちゃんと残すのが店長の仕事なのだ🍡」
+
+---
+
+💡**次ステップおすすめ**
+
+* [Python logging 公式ドキュメント](https://docs.python.org/ja/3/library/logging.html)
+* [Google Advanced Data Analytics Professional Certificate](https://www.coursera.org/professional-certificates/google-advanced-data-analytics)
+
+---
+
+📘**この記事で学べるスキル**
+
+* ログ設定・フォーマットの理解
+* 日付ローテーション設定
+* 例外処理（try/except/finally）
+* ログと例外を組み合わせた実務コード
+
+---
+
+もし希望あれば、次の記事として
+「🧩ログ × Git × デバッグ入門（logger + breakpoint + Git連携）」
+の note 連載用テンプレートも作成できます。
+
+➡ 作りますか？
